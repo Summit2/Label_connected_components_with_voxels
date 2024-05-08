@@ -1,0 +1,4 @@
+laspy==2.5.0
+numpy==1.21.6
+pypcd @ git+https://github.com/DanielPollithy/pypcd.git@88ab8c98ab81dd620bf4b22d965b37457aab78f8
+python-lzf==0.2.4
