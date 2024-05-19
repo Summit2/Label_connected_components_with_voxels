@@ -17,7 +17,8 @@ class PCD:
         self.points = np.asarray(self.points)
         if self.intensity == None:
             self.intensity = np.full(self.points.shape[0], 0)
-        dt = np.c_[self.points, self.intensity]
+        
+        dt = np.c_[self.points, self.intensity] # по сути добавляет колонку intensity нашему массиву точек
         dt = np.array(dt, dtype=np.float32)
         new_cloud = PCD_UTILS.make_xyz_intensity_point_cloud(dt)
         if verbose:

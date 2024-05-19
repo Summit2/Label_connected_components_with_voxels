@@ -24,6 +24,8 @@ class PCD_UTILS:
             raise ValueError('array must be float32')
         if metadata is not None:
             md.update(metadata)
+        
+        print(xyz_intensity.dtype)
         pc_data = xyz_intensity.view(np.dtype([('x', np.float32),
                                         ('y', np.float32),
                                         ('z', np.float32),
