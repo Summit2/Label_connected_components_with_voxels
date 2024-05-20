@@ -34,12 +34,12 @@ def label_connected_components(voxel_indices, connectivity=26):
 
 
 
-def label_connected_components_cc3d(voxel_indices, connectivity):
+def label_connected_components_cc3d(voxel_indices, connectivity, delta):
 # надо понять, что подавать, чтобы получать нормальный результат
-    labels_out = cc3d.connected_components(voxel_indices, connectivity=connectivity)
+    labels_out , N  = cc3d.connected_components(voxel_indices, connectivity=connectivity, return_N = True, delta=delta)
     
 
-    return labels_out
+    return labels_out , N
 
 
 def map_voxel_labels_to_points(points, voxel_indices, labeled_array, voxel_size):
@@ -91,40 +91,41 @@ if __name__ == "__main__":
     input_path = "trees.pcd"  # "/path/to/input.las", or "/path/to/input.pcd"
     output_path = "trees_voxeled.pcd"  # "/path/to/output.pcd" !only *.pcd!
 
-    # Шаг 1: Загрузка облака точек
+ 
     points, pc_data = load_pcd(input_path)
     
-    # Шаг 2: Вокселизация
+
     voxel_grid = voxelize_points(points, voxel_size)
     
-    # Шаг 3: Преобразование вокселей в numpy массив
+
     voxel_indices = voxel_grid_to_numpy(voxel_grid)
     
     
-    # Шаг 4: Нахождение связанных компонент
-    # labeled_array, num_features = label_connected_components(voxel_indices, connectivity)
+   
     
-    labels_out = label_connected_components_cc3d(voxel_indices, connectivity)
+    labels_out,_ = label_connected_components_cc3d(voxel_indices, connectivity, delta = 10)
 
-    # Шаг 5: Маппинг меток вокселей к исходным точкам
+    print(labels_out)
+   
     # labels = map_voxel_labels_to_points(points, voxel_indices, labeled_array, voxel_size)
 
 
-    # # Шаг 6: Создание облака точек с метками (для визуализации, если нужно)
+   
     # labeled_pcd, _ = create_labeled_point_cloud(voxel_indices, labeled_array)
     
-    # # Шаг 7: Сохранение результата в PCD файл
+ 
     # save_labeled_pcd(pc_data, labels, output_path)
     # print(f"Saved labeled point cloud to {output_path} with {num_features} connected components.")
-
-
-
-    # print(labeled_array.shape)
-    pcd = o3d.geometry.PointCloud()
     
-    pcd.points = o3d.utility.Vector3dVector(labels_out)
-    # pcd.colors = o3d.utility.Vector3dVector(np.ones(voxel_indices.shape)*np.array([123,233,40]) /255)
-    # print(np.zeros(voxel_indices.shape))
-    o3d.visualization.draw_geometries([pcd])
+   
+
+    
+    
+    # pcd = o3d.geometry.PointCloud()
+    
+    # pcd.points = o3d.utility.Vector3dVector(labels_out)
+    # # pcd.colors = o3d.utility.Vector3dVector(np.ones(voxel_indices.shape)*np.array([123,233,40]) /255)
+    
+    # o3d.visualization.draw_geometries([pcd])
     
     
