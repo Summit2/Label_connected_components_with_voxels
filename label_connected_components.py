@@ -4,6 +4,8 @@ import scipy
 import open3d as o3d
 from classes.PCD import PCD
 import matplotlib.pyplot as plt
+import cc3d #connected-components
+
 
 def load_pcd(file_path):
     pc_data = PCD()
@@ -15,6 +17,7 @@ def voxelize_points(points, voxel_size):
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(points)
     voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(pcd, voxel_size) # создаем воксельную сетку из облака точек
+    # o3d.visualization.draw_geometries([voxel_grid]) #можно промежуточно посмотреть на воксели
     return voxel_grid
 
 def voxel_grid_to_numpy(voxel_grid):
@@ -28,6 +31,15 @@ def label_connected_components(voxel_indices, connectivity=26):
     voxel_array[tuple(voxel_indices.T)] = True
     labeled_array, num_features = scipy.ndimage.label(voxel_array, structure=np.ones((3, 3, 3)) if connectivity == 26 else np.eye(3))
     return labeled_array, num_features
+
+
+def label_connected_components_cc3d(voxel_indices, connectivity):
+
+    labels_out = cc3d.connected_components(voxel_indices, connectivity=connectivity)
+    
+
+
+
 
 def map_voxel_labels_to_points(points, voxel_indices, labeled_array, voxel_size):
     voxel_indices_dict = {tuple(idx): label for idx, label in zip(voxel_indices, labeled_array[tuple(voxel_indices.T)])}
@@ -70,11 +82,11 @@ def save_labeled_pcd(original_pc_data, labels, output_path):
     print(labeled_data)
     # Save the labeled point cloud
     new_pc_data.save(output_path, verbose=True)
-    
+
 
 if __name__ == "__main__":
-    voxel_size = 0.1
-    connectivity = 26
+    voxel_size = 0.05
+    connectivity = 6
     input_path = "trees.pcd"  # "/path/to/input.las", or "/path/to/input.pcd"
     output_path = "trees_voxeled.pcd"  # "/path/to/output.pcd" !only *.pcd!
 
@@ -87,16 +99,27 @@ if __name__ == "__main__":
     # Шаг 3: Преобразование вокселей в numpy массив
     voxel_indices = voxel_grid_to_numpy(voxel_grid)
     
+    print(np.asarray(voxel_grid))
+    print()
+    print(voxel_indices)
     # Шаг 4: Нахождение связанных компонент
-    labeled_array, num_features = label_connected_components(voxel_indices, connectivity)
+    # labeled_array, num_features = label_connected_components(voxel_indices, connectivity)
     
+    # label_connected_components_cc3d(voxel_indices, connectivity)
+
     # Шаг 5: Маппинг меток вокселей к исходным точкам
-    labels = map_voxel_labels_to_points(points, voxel_indices, labeled_array, voxel_size)
+    # labels = map_voxel_labels_to_points(points, voxel_indices, labeled_array, voxel_size)
 
 
-    # Шаг 6: Создание облака точек с метками (для визуализации, если нужно)
-    labeled_pcd, _ = create_labeled_point_cloud(voxel_indices, labeled_array)
+    # # Шаг 6: Создание облака точек с метками (для визуализации, если нужно)
+    # labeled_pcd, _ = create_labeled_point_cloud(voxel_indices, labeled_array)
     
-    # Шаг 7: Сохранение результата в PCD файл
-    save_labeled_pcd(pc_data, labels, output_path)
-    print(f"Saved labeled point cloud to {output_path} with {num_features} connected components.")
+    # # Шаг 7: Сохранение результата в PCD файл
+    # save_labeled_pcd(pc_data, labels, output_path)
+    # print(f"Saved labeled point cloud to {output_path} with {num_features} connected components.")
+
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(voxel_indices)
+    o3d.visualization.draw_geometries([pcd])
+    
+    
