@@ -127,7 +127,7 @@ def save_labeled_pcd(original_pc_data, labels, output_path):
 
 
 if __name__ == "__main__":
-    voxel_size = 0.5
+    voxel_size = 0.18
     connectivity = 26
     input_path = "trees.pcd"  # "/path/to/input.las", or "/path/to/input.pcd"
     output_path = "trees_voxeled.pcd"  # "/path/to/output.pcd" !only *.pcd!
@@ -150,7 +150,8 @@ if __name__ == "__main__":
     labels_out,N_components = label_connected_components_cc3d(cc3d_labels, connectivity = connectivity, delta = 0)
 
    
-    print(labels_out[0])
+    # print(np.max(labels_out[32,:,:]))
+    print(labels_out)
 
     print(labels_out.shape)
     print('Number of components detected:',N_components)
