@@ -119,33 +119,13 @@ def save_labeled_pcd(original_pc_data, labels, output_path):
     # Save the labeled point cloud
     new_pc_data.save(output_path, verbose=True)
 
-def label_to_rgb(label, num_classes):
-    """
-    Convert a class label to an RGB color.
-    """
-    rgb = np.zeros((num_classes, 3))
-    for i in range(num_classes):
-        rgb[i] = np.random.rand(3)  # Generate random RGB values for demonstration
-    return rgb[label]
+
+def label_connected_components_with_voxels(pcd_points, voxel_size, connectivity):
 
 
-if __name__ == "__main__":
-    voxel_size = 0.10023
-    connectivity = 26
-    input_path = "trees.pcd"  # "/path/to/input.las", or "/path/to/input.pcd"
-    output_path = "trees_voxeled.pcd"  # "/path/to/output.pcd" !only *.pcd!
-
- 
-    points, pc_data = load_pcd(input_path)
-    
-
-    voxel_grid = voxelize_points(points, voxel_size)
-    
-
+    voxel_grid = voxelize_points(pcd_points, voxel_size)
     voxel_indices = voxel_grid_to_numpy(voxel_grid)
-    
-    
-    
+       
     
     cc3d_labels = encode_voxels_to_cc3d_format(voxel_indices)
     
@@ -163,17 +143,68 @@ if __name__ == "__main__":
     
    
     cmap = plt.get_cmap('viridis')
-    rgb_colors = cmap(class_labels) # RGBA
-    
-    
-    pcd = o3d.geometry.PointCloud()
-    
-    
+    class_labels_RGB= cmap(class_labels) # RGBA
 
+    return voxel_indices,class_labels_RGB[:,:3]
+
+def visualize_voxels(voxel_indices, colors =np.array([])):
+
+    pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(voxel_indices)
-    pcd.colors = o3d.utility.Vector3dVector(rgb_colors[:, :3])
     
+    if colors.shape[0]!=0:
+        pcd.colors = o3d.utility.Vector3dVector(colors)
+    # else:
+    #     pcd.colors = np.zeros(shape = voxel_indices.shape[0])
     # print(np.column_stack((rgb_colors[:, 0], rgb_colors[:, 1], rgb_colors[:, 2])))
     o3d.visualization.draw_geometries([pcd])
+
+
+
+def test_2_classes(voxel_size):
     
+    set1, set2 = (np.random.randint(1,10, size=(30,3)) ,  np.random.randint(50,60,size=(30,3)))
+    points = np.vstack((set1,set2))
+
+    voxel_indices,class_labels_RGB = label_connected_components_with_voxels(points,voxel_size=voxel_size, connectivity=26)
+    
+   
+    visualize_voxels(voxel_indices, class_labels_RGB)
+
+    return voxel_indices,class_labels_RGB
+    
+   
+    
+if __name__ == "__main__":
+    voxel_size = 20
+    connectivity = 26
+    input_path = "trees.pcd"  # "/path/to/input.las", or "/path/to/input.pcd"
+    output_path = "trees_voxeled.pcd"  # "/path/to/output.pcd" !only *.pcd!
+
+ 
+    
+    points, pc_data = load_pcd(input_path)
+    
+
+    # voxel_indices,class_labels_RGB = label_connected_components_with_voxels(points,voxel_size, connectivity)
+    
+    # save_labeled_pcd(pc_data, labels, output_path)
+    # print(f"Saved labeled point cloud to {output_path} with {num_features} connected components.")
+    
+   
+    # visualize_voxels(voxel_indices, class_labels_RGB)
+
+    test_voxel_indices,test_class_labels = test_2_classes(voxel_size=3)
+    
+    for i in range(test_voxel_indices.shape[0]):
+        print(test_voxel_indices[i],test_class_labels[i])
+    # pcd = o3d.geometry.PointCloud()
+    # pcd.points = o3d.utility.Vector3dVector(voxel_indices)
+    # pcd.colors = o3d.utility.Vector3dVector()
+   
+    # o3d.visualization.draw_geometries([pcd])
+    
+
+
+
     
