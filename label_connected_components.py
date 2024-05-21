@@ -26,14 +26,6 @@ def voxel_grid_to_numpy(voxel_grid):
     voxel_indices = np.array([v.grid_index for v in voxels])
     return voxel_indices
 
-def label_connected_components(voxel_indices, connectivity=26):
-    shape = voxel_indices.max(axis=0) + 1
-    voxel_array = np.zeros(shape, dtype=bool)
-    voxel_array[tuple(voxel_indices.T)] = True
-    labeled_array, num_features = scipy.ndimage.label(voxel_array, structure=np.ones((3, 3, 3)) if connectivity == 26 else np.eye(3))
-    return labeled_array, num_features
-
-
 
 def label_connected_components_cc3d(voxel_indices, connectivity, delta):
 # надо понять, что подавать, чтобы получать нормальный результат
@@ -55,7 +47,7 @@ def encode_voxels_to_cc3d_format(voxel_indices):
 #                             [[0, 0, 0],[0, 0, 0],[0, 0, 0],[0, 1, 0],[0, 1, 0],[0, 1, 0]],
 #                             [[0, 0, 0],[0, 0, 0],[0, 0, 0],[0, 1, 0],[0, 1, 0],[0, 1, 0]],
 #                             [[0, 0, 0],[0, 0, 0],[0, 0, 0],[0, 1, 0],[0, 1, 0],[0, 1, 0]]   
-#                             # а внутри координаты, сколько брать вверх по z
+#                             # а внутри координаты, сколько брать по z
 # ])
 
     
@@ -80,7 +72,6 @@ def decode_cc3d_to_voxels_with_class_labels(cc3d_input,voxel_indices):
     for i, xyz in enumerate(voxel_indices):
         
         class_labels[i] = cc3d_input[xyz[0],xyz[1],xyz[2]]
-
     return class_labels
 
 
@@ -139,8 +130,8 @@ def label_to_rgb(label, num_classes):
 
 
 if __name__ == "__main__":
-    voxel_size = 0.18
-    connectivity = 6
+    voxel_size = 0.10023
+    connectivity = 26
     input_path = "trees.pcd"  # "/path/to/input.las", or "/path/to/input.pcd"
     output_path = "trees_voxeled.pcd"  # "/path/to/output.pcd" !only *.pcd!
 
@@ -172,12 +163,12 @@ if __name__ == "__main__":
     
    
     cmap = plt.get_cmap('viridis')
-    rgb_colors = cmap(class_labels)
+    rgb_colors = cmap(class_labels) # RGBA
     
     
     pcd = o3d.geometry.PointCloud()
     
-    print(rgb_colors)
+    
 
     pcd.points = o3d.utility.Vector3dVector(voxel_indices)
     pcd.colors = o3d.utility.Vector3dVector(rgb_colors[:, :3])
