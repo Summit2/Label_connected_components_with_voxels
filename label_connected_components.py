@@ -112,7 +112,6 @@ if __name__ == "__main__":
     
     input_path = "trees.pcd"  # "/path/to/input.las", or "/path/to/input.pcd"
     output_path = "trees_voxeled.pcd"  # "/path/to/output.pcd" !only *.pcd!
-
     points, pc_data = load_pcd(input_path)
     
 
