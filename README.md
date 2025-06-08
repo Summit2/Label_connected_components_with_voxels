@@ -10,7 +10,10 @@
 ```bash
 python -m venv env && env/Scripts/activate
 ```
-
+Установите необходимые зависимости:  
+```bash
+pip install -r requirements.txt
+```
 В файле label_connected_components.py укажите правильный входной путь файла.
 Далее вызовите этот файл:  
 ```bash
