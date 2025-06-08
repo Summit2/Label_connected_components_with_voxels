@@ -4,9 +4,17 @@
 
 Формат входных данных - файл .pcd  
 
-Запуск программы:  
+### Запуск программы:  
+
+Создайте виртуальное окружение:  
 ```bash
-yarn deploy
+python -m venv env && env/Scripts/activate
+```
+
+В файле label_connected_components.py укажите правильный входной путь файла.
+Далее вызовите этот файл:  
+```bash
+python label_connected_components.py
 ```
 
 Результат кластеризации:  
