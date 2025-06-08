@@ -20,5 +20,5 @@ pip install -r requirements.txt
 python label_connected_components.py
 ```
 
-Результат кластеризации:  
+### Результат кластеризации:  
 ![image](https://github.com/user-attachments/assets/62c0b199-a96e-47e6-9ed3-ed0a00787f17)
